@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:health_cure/features/authentication/models/user_model.dart';
 import 'dart:async';
 
@@ -10,24 +11,44 @@ class PhoneAuthResult {
   final PhoneAuthCredential? credential;
   final FirebaseAuthException? error;
 
-  PhoneAuthResult({
-    this.verificationId,
-    this.credential,
-    this.error,
-  });
+  PhoneAuthResult({this.verificationId, this.credential, this.error});
 }
 
 class AuthenticationService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final GoogleSignIn googleSignIn = GoogleSignIn();
+  // signin with googel 
+   Future<User?> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
 
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+
+      UserCredential userCredential = await _auth.signInWithCredential(
+        credential,
+      );
+      if (userCredential.user != null) {
+        return userCredential.user;
+      }
+      return null;
+    } catch (e) {
+      Logger().e(e);
+      throw Exception(e);
+    }
+  }
   /// Login with phone number
   Future<PhoneAuthResult> sendOtpToPhoneNumber({
     required String phoneNumber,
   }) async {
     try {
       Completer<PhoneAuthResult> completer = Completer();
-      
+
       await _auth.verifyPhoneNumber(
         phoneNumber: phoneNumber,
         verificationCompleted: (PhoneAuthCredential credential) {
@@ -47,20 +68,22 @@ class AuthenticationService {
         },
         codeAutoRetrievalTimeout: (String verificationId) {
           if (!completer.isCompleted) {
-            completer.complete(PhoneAuthResult(
-              verificationId: verificationId,
-              error: FirebaseAuthException(
-                code: 'timeout',
-                message: 'OTP code retrieval timed out',
+            completer.complete(
+              PhoneAuthResult(
+                verificationId: verificationId,
+                error: FirebaseAuthException(
+                  code: 'timeout',
+                  message: 'OTP code retrieval timed out',
+                ),
               ),
-            ));
+            );
           }
         },
       );
 
       return await completer.future;
     } catch (e) {
-      Logger().e(e);
+      Logger().i(e);
       throw Exception(e);
     }
   }
@@ -115,12 +138,10 @@ class AuthenticationService {
   /// create user in database
   Future<User?> createUser({
     required String phoneNumber,
-    required String password,
   }) async {
     final User? user = _auth.currentUser;
     await _firestore.collection('users').doc(user?.uid).set({
       'phone ': phoneNumber,
-      'password': password,
     });
     return user;
   }
@@ -151,7 +172,9 @@ class AuthenticationService {
   Future<User?> signInWithCredential({
     required PhoneAuthCredential credential,
   }) async {
-    final UserCredential userCredential = await _auth.signInWithCredential(credential);
+    final UserCredential userCredential = await _auth.signInWithCredential(
+      credential,
+    );
     return userCredential.user;
   }
 

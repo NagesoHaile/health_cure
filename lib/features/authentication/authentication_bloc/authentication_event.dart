@@ -9,14 +9,12 @@ class AuthenticationEvent extends Equatable {
 
 class LoginWithPhoneNumberEvent extends AuthenticationEvent {
   final String phoneNumber;
-  final String password;
-  const LoginWithPhoneNumberEvent({required this.phoneNumber, required this.password});
+  const LoginWithPhoneNumberEvent({required this.phoneNumber});
 } 
 
 class RegisterUserEvent extends AuthenticationEvent {
   final String phoneNumber;
-  final String password;
-  const RegisterUserEvent({required this.phoneNumber, required this.password});
+  const RegisterUserEvent({required this.phoneNumber});
 }
 
 class VerifyOtpEvent extends AuthenticationEvent {
@@ -24,8 +22,11 @@ class VerifyOtpEvent extends AuthenticationEvent {
   final String otp;
   final String? phoneNumber;
   final PhoneAuthCredential? credential;
-  final String? password;
-  const VerifyOtpEvent({required this.verificationId, required this.otp, this.phoneNumber, this.credential, this.password});
+  const VerifyOtpEvent({required this.verificationId, required this.otp, this.phoneNumber, this.credential});
+}
+
+class SignInWithGoogleEvent extends AuthenticationEvent {
+  const SignInWithGoogleEvent();
 }
 
 

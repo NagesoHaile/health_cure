@@ -14,11 +14,9 @@ class OtpScreen extends StatefulWidget {
     super.key,
     required this.verificationId,
     required this.phoneNumber,
-    required this.password,
   });
   final String verificationId;
   final String phoneNumber;
-  final String password;
   @override
   State<OtpScreen> createState() => _OtpScreenState();
 }
@@ -99,28 +97,29 @@ class _OtpScreenState extends State<OtpScreen>
     return BlocConsumer<AuthenticationBloc, AuthenticationState>(
       bloc: _authenticationBloc,
       listener: (context, state) {
-        if(state.status == AuthenticationStatus.otpVerified){
+        if (state.status == AuthenticationStatus.otpVerified) {
           LoadingWidget.hide(context);
           LocalStorage.instance.setBool('user_logged_in', true);
           context.goNamed(RouteName.home);
         }
-        if(state.status == AuthenticationStatus.otpVerificationLoading){
+        if (state.status == AuthenticationStatus.otpVerificationLoading) {
           LoadingWidget.show(context);
         }
-        if(state.status == AuthenticationStatus.otpVerificationFailure){
+        if (state.status == AuthenticationStatus.otpVerificationFailure) {
           LoadingWidget.hide(context);
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.error)));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.error)));
         }
-        
       },
       builder: (context, state) {
         return Scaffold(
           backgroundColor: Colors.white,
           extendBodyBehindAppBar: true,
-          
+
           appBar: AppBar(
             backgroundColor: Colors.transparent,
-            
+
             elevation: 0,
             title: const Text('OTP Verification'),
           ),
@@ -208,7 +207,13 @@ class _OtpScreenState extends State<OtpScreen>
                                           ),
                                     ),
                                     onCompleted: (pin) {
-                                      _authenticationBloc.add(VerifyOtpEvent(verificationId: widget.verificationId, otp: pin, password: widget.password));
+                                      otpController.text = pin;
+                                      _authenticationBloc.add(
+                                        VerifyOtpEvent(
+                                          verificationId: widget.verificationId,
+                                          otp: pin,
+                                        ),
+                                      );
                                     },
                                   ),
                                   // const SizedBox(height: 24),
@@ -254,6 +259,14 @@ class _OtpScreenState extends State<OtpScreen>
                                     onPressed: () {
                                       if (formKey.currentState!.validate()) {
                                         context.goNamed(RouteName.home);
+                                        // _authenticationBloc.add(
+                                        //   VerifyOtpEvent(
+                                        //     verificationId:
+                                        //         widget.verificationId,
+                                        //     otp: otpController.text,
+                                        //     password: widget.password,
+                                        //   ),
+                                        // );
                                       }
                                     },
                                     style: ElevatedButton.styleFrom(

@@ -74,7 +74,6 @@ GoRouter router = GoRouter(
             child: OtpScreen(
               verificationId: (state.extra as Map)['verificationId'] as String,
               phoneNumber: (state.extra as Map)['phoneNumber'] as String,
-              password: (state.extra as Map)['password'] as String,
             ),
             direction: Direction.left,
           ),

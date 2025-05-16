@@ -15,6 +15,9 @@ enum AuthenticationStatus {
   loginWithPhoneNumberSuccess,
   loginWithPhoneNumberFailure,
   isNewUser,
+  signInWithGoogleLoading,
+  signInWithGoogleSuccess,
+  signInWithGoogleFailure,
 }
 
 class AuthenticationState extends Equatable {
@@ -23,16 +26,16 @@ class AuthenticationState extends Equatable {
   final String? verificationId;
   final String? otp;
   final String? phoneNumber;
-  final String? password;
   final PhoneAuthCredential? credential;
+  final User? user;
   const AuthenticationState({
     required this.status,
     required this.error,
     required this.verificationId,
     required this.otp,
     required this.phoneNumber,
-    required this.password,
     required this.credential,
+    required this.user,
   });
 
   static const initial = AuthenticationState(
@@ -41,8 +44,8 @@ class AuthenticationState extends Equatable {
     verificationId: null,
     otp: null,
     phoneNumber: null,
-    password: null,
     credential: null,
+    user: null,
   );
   AuthenticationState copyWith({
     AuthenticationStatus? status,
@@ -50,8 +53,8 @@ class AuthenticationState extends Equatable {
     String? verificationId,
     String? otp,
     String? phoneNumber,  
-    String? password,
     PhoneAuthCredential? credential,
+    User? user,
   }) {
     return AuthenticationState(
       status: status ?? this.status,
@@ -59,8 +62,8 @@ class AuthenticationState extends Equatable {
       verificationId: verificationId ?? this.verificationId,
       otp: otp ?? this.otp,
       phoneNumber: phoneNumber ?? this.phoneNumber,
-      password: password ?? this.password,
       credential: credential ?? this.credential,
+      user: user ?? this.user,
     );
   }
 
@@ -71,8 +74,8 @@ class AuthenticationState extends Equatable {
     verificationId,
     otp,
     phoneNumber,
-    password,
     credential,
+    user,
   ];
 }
 // class AuthenticationInitial extends AuthenticationState {}

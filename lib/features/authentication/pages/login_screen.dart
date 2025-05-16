@@ -3,11 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:health_cure/config/route/route_name.dart';
 import 'package:health_cure/config/theme/app_colors.dart';
-// import 'package:health_cure/core/colors/app_colors.dart';
-// import 'package:health_cure/core/widgets/app_text_button.dart';
-import 'package:health_cure/core/widgets/app_text_field.dart';
 import 'package:health_cure/core/widgets/loading_widget.dart';
 import 'package:health_cure/features/authentication/authentication_bloc/authentication_bloc.dart';
+import 'package:health_cure/features/authentication/widgets/sign_in_with_google_button.dart';
 import 'package:health_cure/service_locator.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:logger/logger.dart';
@@ -23,7 +21,6 @@ class _LoginScreenState extends State<LoginScreen>
     with SingleTickerProviderStateMixin {
   final formKey = GlobalKey<FormState>();
   final phoneController = TextEditingController();
-  final passwordController = TextEditingController();
   String? _phoneNumber;
 
   late AnimationController _controller;
@@ -59,7 +56,6 @@ class _LoginScreenState extends State<LoginScreen>
   void dispose() {
     _controller.dispose();
     phoneController.dispose();
-    passwordController.dispose();
     super.dispose();
   }
 
@@ -80,7 +76,6 @@ class _LoginScreenState extends State<LoginScreen>
       _authenticationBloc.add(
         LoginWithPhoneNumberEvent(
           phoneNumber: _phoneNumber!,
-          password: passwordController.text,
         ),
       );  
     
@@ -102,11 +97,9 @@ class _LoginScreenState extends State<LoginScreen>
 
           LoadingWidget.hide(context);
             phoneController.clear();
-      passwordController.clear();
           context.pushNamed(RouteName.otp, extra: {
             'verificationId': state.verificationId,
             'phoneNumber': _phoneNumber,
-            'password': passwordController.text,
           });
           
         }
@@ -125,16 +118,22 @@ class _LoginScreenState extends State<LoginScreen>
                 ),
           );
         }
-        // if (state is LoginWithPhoneNumberFailure) {
-        //   LoadingWidget.hide(context);
-        //   showDialog(
-        //     context: context,
-        //     builder: (context) => AlertDialog(
-        //       title: const Text('Error'),
-        //       content: Text(state.error),
-        //     ),
-        //   );
-        // }
+        if(state.status == AuthenticationStatus.signInWithGoogleLoading){
+          LoadingWidget.show(context);
+        }
+        if(state.status == AuthenticationStatus.signInWithGoogleSuccess){
+          LoadingWidget.hide(context);
+          context.goNamed(RouteName.home);
+        }
+        if(state.status == AuthenticationStatus.signInWithGoogleFailure){
+          LoadingWidget.hide(context);
+           ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Error'),
+            ),
+          );
+        }
+      
       },
       builder: (context, state) {
         return Scaffold(
@@ -238,36 +237,7 @@ class _LoginScreenState extends State<LoginScreen>
                                     },
                                   ),
 
-                                  const SizedBox(height: 24),
 
-                                  AppTextField(
-                                    label: 'Password',
-                                    obscureText: obscureText,
-                                    controller: passwordController,
-                                    textInputAction: TextInputAction.done,
-                                    suffix: GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          obscureText = !obscureText;
-                                        });
-                                      },
-                                      child: Icon(
-                                        obscureText
-                                            ? Icons.visibility
-                                            : Icons.visibility_off,
-                                      ),
-                                    ),
-
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please enter your password';
-                                      }
-                                      if (value.length < 6) {
-                                        return 'Password must be at least 6 characters';
-                                      }
-                                      return null;
-                                    },
-                                  ),
 
                                   const SizedBox(height: 40),
                                   ElevatedButton(
@@ -292,8 +262,26 @@ class _LoginScreenState extends State<LoginScreen>
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(height: 24),
-                                ],
+                                  const SizedBox(height: 48),
+                                  Row(
+                                    spacing: 10,
+                                    children: [
+                                      Expanded(child: Divider(
+                                        color: AppColors.secondary,
+                                      )),
+                                      Text('OR',style: Theme.of(context).textTheme.bodyMedium,),
+                                      Expanded(child: Divider(
+                                        color: AppColors.secondary,
+                                      )),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 48),
+                                  SignInWithGoogleButton(
+                                    onPressed: (){
+                                      _authenticationBloc.add(SignInWithGoogleEvent());
+                                    },
+                                  ),
+                                 ],
                               ),
                             ),
                           ),
