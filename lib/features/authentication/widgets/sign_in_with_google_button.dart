@@ -20,6 +20,9 @@ class SignInWithGoogleButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(4),
+          ),
           // surfaceTintColor: const Color(0xFFFFB101),
         ),
         child:

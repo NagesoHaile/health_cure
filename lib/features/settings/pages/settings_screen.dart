@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:health_cure/config/route/route_name.dart';
 import 'package:health_cure/core/common/theme_bloc/theme_bloc.dart';
+import 'package:health_cure/core/database/local_storage.dart';
+import 'package:health_cure/features/authentication/services/authentication_service.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -25,16 +27,17 @@ class SettingsScreen extends StatelessWidget {
                     content: const Text('Are you sure you want to logout?'),
                     actions: [
                       TextButton(
-                          onPressed: () {
-                            //TODO: Implement logout
+                          onPressed: () async {
+                            await LocalStorage.instance.setBool('user_logged_in', false);
+                            await AuthenticationService().signOut();
                             context.goNamed(RouteName.login);
                           },
-                          child: const Text('Logout')),
+                          child: const Text('Yes')),
                       ElevatedButton(
                           onPressed: () {
                             context.pop();
                           },
-                          child: const Text('Cancel'))
+                          child: const Text('No'))
                     ],
                   ),
                 );

@@ -36,8 +36,12 @@ class AuthenticationService {
       if (userCredential.user != null) {
         return userCredential.user;
       }
+      await _auth.signOut();
+      await googleSignIn.signOut();
       return null;
     } catch (e) {
+      await _auth.signOut();
+      await googleSignIn.signOut();
       Logger().e(e);
       throw Exception(e);
     }
@@ -145,7 +149,10 @@ class AuthenticationService {
     });
     return user;
   }
-
+  Future<User?> getCurrentUser() async {
+    final User? user = _auth.currentUser;
+    return user;
+  }
   /// get user from database
   Future<UserModel?> getUser({required String phoneNumber}) async {
     final querySnapshot =
@@ -156,7 +163,6 @@ class AuthenticationService {
     if (querySnapshot.docs.isNotEmpty) {
       Logger().d(querySnapshot.docs.first.data());
       final user = UserModel.fromJson(querySnapshot.docs.first.data());
-
       return user;
     }
     return null;
@@ -180,6 +186,12 @@ class AuthenticationService {
 
   /// sign out user
   Future<void> signOut() async {
-    await _auth.signOut();
+    try {
+      await googleSignIn.signOut();
+      await _auth.signOut();
+    } catch (e) {
+      Logger().e(e);
+      throw Exception(e);
+    }
   }
 }

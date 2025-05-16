@@ -1,12 +1,31 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:health_cure/config/route/route_name.dart';
 import 'package:health_cure/core/widgets/app_logo.dart';
 import 'package:health_cure/config/theme/app_colors.dart';
-
-class HomeScreen extends StatelessWidget {
+import 'package:health_cure/features/authentication/services/authentication_service.dart';
+import 'package:logger/logger.dart';
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getUserData();
+  }
+  User? user;
+  void getUserData() async {
+    final user = await AuthenticationService().getCurrentUser();
+    setState(() {
+      this.user = user;
+    });
+    Logger().i(user);
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +49,7 @@ class HomeScreen extends StatelessWidget {
                     end: Alignment.bottomRight,
                   ).createShader(bounds),
                   child: Text(
-                    'Welcome to HealthCure',
+                  'Welcome back, ${user?.displayName?.split(' ')[0] ?? "to HealthCure"}',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       color: Colors.white, // This color will be replaced by the gradient
                     ),
