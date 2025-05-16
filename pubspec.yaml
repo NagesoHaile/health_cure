@@ -50,6 +50,7 @@ dependencies:
   logger: ^2.5.0
   flutter_svg: ^2.1.0
   google_sign_in: ^6.3.0
+  skeletonizer: ^1.4.3
 
 
 dev_dependencies:
