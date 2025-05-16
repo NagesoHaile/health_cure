@@ -11,7 +11,6 @@ class BasePage extends StatefulWidget {
 }
 
 class _BasePageState extends State<BasePage> {
-  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +18,13 @@ class _BasePageState extends State<BasePage> {
     
       body: widget.child,
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onBottomNavigationBarItemTapped,  
+         currentIndex: () {
+            final String currentUri = GoRouterState.of(context).uri.toString();
+            return _convertRouteNameIntoIndex(currentUri);
+          }(),
+       onTap: (index) {
+          context.go(_convertIndexIntoRouteName(index));
+        },  
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.medical_services), label: 'Treatments'),
@@ -30,22 +34,30 @@ class _BasePageState extends State<BasePage> {
     );
   }
 
-  void _onBottomNavigationBarItemTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+   String _convertIndexIntoRouteName(int index) {
     switch (index) {
-    
       case 0:
-        context.goNamed(RouteName.home);
-        break;
+        return RouteName.home;
       case 1:
-        context.goNamed(RouteName.treatments);
-      
-        break;
+        return RouteName.treatments;
+    
       case 2:
-        context.goNamed(RouteName.settings);
-        break;
+        return RouteName.settings;
+      default:
+        return RouteName.home;
+    }
+  }
+
+  int _convertRouteNameIntoIndex(String pathName) {
+    if (pathName.startsWith(RouteName.home)) {
+      return 0;
+    } else if (pathName.startsWith(RouteName.treatments)) {
+      return 1;
+    } else if (pathName.startsWith(RouteName.settings)) {
+      return 2;
+    }
+    else {
+      return 0;
     }
   }
   
