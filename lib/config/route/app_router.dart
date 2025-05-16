@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:health_cure/config/route/route_name.dart';
 import 'package:health_cure/features/authentication/pages/login_screen.dart';
 import 'package:health_cure/features/authentication/pages/otp_screen.dart';
+import 'package:health_cure/features/home/pages/fasting_therapy_detail_screen.dart';
+import 'package:health_cure/features/home/pages/fasting_therapy_screen.dart';
 import 'package:health_cure/features/home/pages/home_screen.dart';
 import 'package:health_cure/features/settings/pages/settings_screen.dart';
 import 'package:health_cure/features/treatment/pages/treatment_detail_screen.dart';
@@ -100,6 +102,20 @@ GoRouter router = GoRouter(
                 child: const HomeScreen(),
                 direction: Direction.right,
               ),
+          routes: [
+            GoRoute(
+              name: RouteName.fastingTherapy,
+              path: RouteName.fastingTherapy,
+              parentNavigatorKey: _rootNavigatorKey,
+              pageBuilder: (context, state) => _customTransitionPage(child: const FastingTherapyScreen(), direction: Direction.right,),
+            ),
+            GoRoute(
+              parentNavigatorKey: _rootNavigatorKey,
+              name: RouteName.fastingTherapyDetail,
+              path: RouteName.fastingTherapyDetail,
+              pageBuilder: (context, state) => _customTransitionPage(child: FastingTherapyDetailScreen(fastingTherapy: state.extra as Map<String, dynamic>), direction: Direction.right,),
+            ),
+          ],
         ),
         GoRoute(
           name: RouteName.treatments,

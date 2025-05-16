@@ -8,5 +8,6 @@ class RouteName {
   static const String treatments = '/treatments';
   static const String settings = '/settings';
   static const String treatmentDetails = '/treatment-details';
-  
+  static const String fastingTherapy = '/fasting-therapy';
+  static const String fastingTherapyDetail = '/fasting-therapy-detail';
 }
